@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <stdlib.h> // Подключение библиотеки для работы с динамической памятью
-#include <string.h> // Подключение библиотеки для работы со строками
+#include <stdlib.h>
+#include <string.h>
 
 // Определение структуры для хранения данных о письме
 struct Letter {
@@ -61,30 +61,34 @@ int add_letter(struct Letter **letters, int count) {
     return count + 1; // Возвращаем обновленное количество писем
 }
 
-// Функция для печати информации о письме
+// Функция для печати информации о письме в виде строки таблицы
 // Принимает указатель на структуру письма
-void print_letter(struct Letter *letter) {
-    printf("Адрес получателя: %s\n", letter->adr1); // Вывод адреса получателя
-    printf("Фамилия получателя: %s\n", letter->fam1); // Вывод фамилии получателя
-    printf("Имя получателя: %s\n", letter->name1); // Вывод имени получателя
-    printf("Адрес отправителя: %s\n", letter->adr2); // Вывод адреса отправителя
-    printf("Фамилия отправителя: %s\n", letter->fam2); // Вывод фамилии отправителя
-    printf("Имя отправителя: %s\n", letter->name2); // Вывод имени отправителя
-    printf("Стоимость: %.2lf\n\n", letter->cost); // Вывод стоимости письма
+void print_letter_row(struct Letter *letter) {
+    printf("| %-18s   %-28s  %-26s  %-18s  %-28s  %-26s  %-9.2lf \n", 
+           letter->adr1, letter->fam1, letter->name1, letter->adr2, letter->fam2, letter->name2, letter->cost);
 }
-
-// Функция для печати всей базы данных писем
+// Функция для печати разделителя таблицы
+void print_table_separator() {
+    printf("+--------------------+----------------------+----------------------+--------------------+----------------------+----------------------+-----------+\n");
+}
+// Функция для печати заголовка таблицы
+void print_table_header() {
+    print_table_separator();
+    printf("| Адрес получателя   | Фамилия получателя   | Имя получателя       | Адрес отправителя  | Фамилия отправителя  | Имя отправителя      | Стоимость |\n");
+    print_table_separator();
+}
+// Функция для печати всей базы данных писем в виде таблицы
 // Принимает указатель на базу данных (массив структур) и количество писем в базе
-void print_letters(struct Letter *letters, int count) {
+void print_letters_table(struct Letter *letters, int count) {
     if (count == 0) { // Проверка на пустую базу данных
         printf("База данных пуста.\n");
         return;
     }
 
-    printf("------------------------------\n"); // Вывод разделителя
+    print_table_header();
     for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-        print_letter(&letters[i]); // Вывод информации о текущем письме
-        printf("------------------------------\n"); // Вывод разделителя
+        print_letter_row(&letters[i]); // Вывод информации о текущем письме
+        print_table_separator();
     }
 }
 
@@ -93,11 +97,13 @@ void print_letters(struct Letter *letters, int count) {
 // Выводит на экран найденные письма
 void find_by_sender(struct Letter *letters, int count, char *fam2, char *name2) {
     int found = 0; // Флаг, указывающий, было ли найдено хотя бы одно письмо
+    print_table_header();
     for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
         // Сравнение фамилии и имени отправителя с заданными значениями
         if (strcmp(letters[i].fam2, fam2) == 0 && strcmp(letters[i].name2, name2) == 0) {
-            print_letter(&letters[i]); // Вывод информации о найденном письме
+            print_letter_row(&letters[i]); // Вывод информации о найденном письме
             found = 1; // Установка флага, что письмо найдено
+            print_table_separator();
         }
     }
     if (!found) { // Если ни одного письма не найдено
@@ -110,10 +116,12 @@ void find_by_sender(struct Letter *letters, int count, char *fam2, char *name2) 
 // Выводит на экран найденные письма
 void find_by_cost(struct Letter *letters, int count, double min_cost) {
     int found = 0; // Флаг, указывающий, было ли найдено хотя бы одно письмо
+    print_table_header();
     for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
         if (letters[i].cost > min_cost) { // Сравнение стоимости письма с заданным значением
-            print_letter(&letters[i]); // Вывод информации о найденном письме
+            print_letter_row(&letters[i]); // Вывод информации о найденном письме
             found = 1; // Установка флага, что письмо найдено
+            print_table_separator();
         }
     }
     if (!found) { // Если ни одного письма не найдено
@@ -128,7 +136,7 @@ int compare_letters_by_cost(const void *a, const void *b) {
     return (cost_b - cost_a); // Возвращаем разницу стоимостей для сортировки по убыванию
 }
  
-// Функц ия для сортировки базы данных по убыванию стоимости
+// Функция для сортировки базы данных по убыванию стоимости
 // Принимает указатель на базу данных и количество писем
 void sort_by_cost(struct Letter *letters, int count) {
     qsort(letters, count, sizeof(struct Letter), compare_letters_by_cost); // Сортировка массива структур
@@ -158,7 +166,7 @@ int main() {
                 count = add_letter(&letters, count); // Вызов функции добавления письма
                 break; // Выход из switch
             case 2: // Печать базы данных
-                print_letters(letters, count); // Вызов функции печати базы данных
+                print_letters_table(letters, count); // Вызов функции печати базы данных
                 break; // Выход из switch
             case 3: { // Поиск по отправителю
                 char fam2[1024], name2[1024]; // Буферы для хранения фамилии и имени отправителя
