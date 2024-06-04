@@ -127,8 +127,8 @@ int compare_letters_by_cost(const void *a, const void *b) {
     double cost_b = ((struct Letter *)b)->cost; // Получение стоимости второго письма
     return (cost_b - cost_a); // Возвращаем разницу стоимостей для сортировки по убыванию
 }
-
-// Функция для сортировки базы данных по убыванию стоимости
+ 
+// Функц ия для сортировки базы данных по убыванию стоимости
 // Принимает указатель на базу данных и количество писем
 void sort_by_cost(struct Letter *letters, int count) {
     qsort(letters, count, sizeof(struct Letter), compare_letters_by_cost); // Сортировка массива структур
