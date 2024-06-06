@@ -112,7 +112,7 @@ void find_by_sender(struct Letter *letters, int count, char *fam2, char *name2) 
 void find_by_cost(struct Letter *letters, int count, double min_cost) {
     int found = 0; // Флаг, указывающий, было ли найдено хотя бы одно письмо
     for (int i = 0; i < count; i++) { // Цикл по всем письмам в базе
-        if (letters[i].cost >= min_cost) { // Сравнение стоимости письма с заданным значением
+        if (letters[i].cost > min_cost) { // Сравнение стоимости письма с заданным значением
             print_letter(&letters[i]); // Вывод информации о найденном письме
             found = 1; // Установка флага, что письмо найдено
         }
