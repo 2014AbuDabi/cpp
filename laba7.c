@@ -260,7 +260,7 @@ int main() {
                 // Освобождаем память перед выходом
                 for (int i = 0; i < count; i++) { 
                     free(letters[i].adr1); 
-                    free(letters[i].recipient.surname); 1
+                    free(letters[i].recipient.surname);
                     free(letters[i].recipient.name); 
                     free(letters[i].adr2); 
                     free(letters[i].sender.surname);
