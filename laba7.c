@@ -107,7 +107,7 @@ int add_letter(struct Letter **letters, int count, struct Date currentDate) {
 
 // Функция для печати информации о письме в виде строки таблицы
 void print_letter_row(struct Letter *letter) {
-    printf("| %-18s   %-2s %-25s  %-18s   %-2s %-25s   %-9.2lf  %02d.%02d.%04d  %d дней \n",
+    printf("| %-18s   %-2s %-25s  %-18s   %-2s %-25s   %-9.2lf    %02d.%02d.%04d  %d дней \n",
            letter->adr1, letter->recipient.surname, letter->recipient.name,
            letter->adr2, letter->sender.surname, letter->sender.name,
            letter->cost, letter->sending_date.day, letter->sending_date.month,
