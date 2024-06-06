@@ -64,7 +64,7 @@ int add_letter(struct Letter **letters, int count) {
 // Функция для печати информации о письме в виде строки таблицы
 // Принимает указатель на структуру письма
 void print_letter_row(struct Letter *letter) {
-    printf("| %-18s   %-28s  %-26s  %-18s  %-28s  %-26s  %-9.2lf \n", 
+    printf("| %-18s   %-28s  %-26s  %-18s   %-28s  %-26s    %-9.2lf \n", 
            letter->adr1, letter->fam1, letter->name1, letter->adr2, letter->fam2, letter->name2, letter->cost);
 }
 // Функция для печати разделителя таблицы
