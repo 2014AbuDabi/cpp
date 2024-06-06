@@ -1,0 +1,256 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+// Определение структуры для хранения данных о письме
+struct Letter {
+        char *adr1;    // Указатель на строку с адресом получателя
+            char *fam1;    // Указатель на строку с фамилией получателя
+                char *name1;   // Указатель на строку с именем получателя
+                    char *adr2;    // Указатель на строку с адресом отправителя
+                        char *fam2;    // Указатель на строку с фамилией отправителя
+                            char *name2;   // Указатель на строку с именем отправителя
+                                double cost;   // Стоимость письма
+                                    struct tm send_date; // Дата отправки письма
+};
+
+// Функция для добавления нового письма в базу данных
+// Принимает указатель на базу данных (массив структур) и количество писем в базе
+// Возвращает обновленное количество писем в базе
+int add_letter(struct Letter **letters, int count) {
+        // Выделяем память под новую структуру письма, увеличивая размер массива
+            *letters = (struct Letter *)realloc(*letters, (count + 1) * sizeof(struct Letter));
+                // Получаем указатель на новую структуру письма
+                    struct Letter *new_letter = &(*letters)[count];
+
+                        // Ввод данных о письме с клавиатуры
+                            char buffer[1024]; // Буфер для временного хранения вводимых строк
+
+                                printf("Введите адрес получателя: "); 
+                                    fgets(buffer, sizeof(buffer), stdin); 
+                                        buffer[strcspn(buffer, "\n")] = 0; 
+                                            new_letter->adr1 = strdup(buffer); 
+
+                                                printf("Введите фамилию получателя: ");
+                                                    fgets(buffer, sizeof(buffer), stdin);
+                                                        buffer[strcspn(buffer, "\n")] = 0;
+                                                            new_letter->fam1 = strdup(buffer);
+
+                                                                printf("Введите имя получателя: ");
+                                                                    fgets(buffer, sizeof(buffer), stdin);
+                                                                        buffer[strcspn(buffer, "\n")] = 0;
+                                                                            new_letter->name1 = strdup(buffer);
+
+                                                                                printf("Введите адрес отправителя: ");
+                                                                                    fgets(buffer, sizeof(buffer), stdin);
+                                                                                        buffer[strcspn(buffer, "\n")] = 0;
+                                                                                            new_letter->adr2 = strdup(buffer);
+
+                                                                                                printf("Введите фамилию отправителя: ");
+                                                                                                    fgets(buffer, sizeof(buffer), stdin);
+                                                                                                        buffer[strcspn(buffer, "\n")] = 0;
+                                                                                                            new_letter->fam2 = strdup(buffer);
+
+                                                                                                                printf("Введите имя отправителя: ");
+                                                                                                                    fgets(buffer, sizeof(buffer), stdin);
+                                                                                                                        buffer[strcspn(buffer, "\n")] = 0;
+                                                                                                                            new_letter->name2 = strdup(buffer);
+
+                                                                                                                                printf("Введите стоимость письма: ");
+                                                                                                                                    scanf("%lf", &new_letter->cost); 
+                                                                                                                                        getchar(); 
+
+                                                                                                                                            // Ввод и проверка даты отправки
+                                                                                                                                                while (1) {
+                                                                                                                                                            printf("Введите дату отправки (день месяц год): ");
+                                                                                                                                                                    if (scanf("%d %d %d", &new_letter->send_date.tm_mday, &new_letter->send_date.tm_mon, &new_letter->send_date.tm_year) != 3) {
+                                                                                                                                                                                    printf("Ошибка: Неверный формат даты.\n");
+                                                                                                                                                                                                while (getchar() != '\n'); // Очистка буфера ввода
+                                                                                                                                                                                                            continue;
+                                                                                                                                                                    }
+
+                                                                                                                                                                            new_letter->send_date.tm_year -= 1900; // Корректировка года
+                                                                                                                                                                                    new_letter->send_date.tm_mon -= 1; // Корректировка месяца
+
+                                                                                                                                                                                            // Проверка на корректность даты
+                                                                                                                                                                                                    if (mktime(&new_letter->send_date) == (time_t)-1) {
+                                                                                                                                                                                                                    printf("Ошибка: Неверная дата.\n");
+                                                                                                                                                                                                                                continue;
+                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                            // Проверка на то, что дата отправки не больше текущей даты
+                                                                                                                                                                                                                    time_t now = time(NULL);
+                                                                                                                                                                                                                            if (mktime(&new_letter->send_date) > now) {
+                                                                                                                                                                                                                                            printf("Ошибка: Дата отправки больше текущей даты.\n");
+                                                                                                                                                                                                                                                        continue;
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                    getchar(); // Очистка буфера ввода
+                                                                                                                                                                                                                                            break; // Выход из цикла, если дата корректна
+                                                                                                                                                }
+
+                                                                                                                                                    return count + 1; // Возвращаем обновленное количество писем
+}
+
+// Функция для печати информации о письме в виде строки
+// Принимает указатель на структуру письма
+void print_letter(struct Letter *letter) {
+        printf("Адрес получателя: %s\n", letter->adr1);
+            printf("Фамилия получателя: %s\n", letter->fam1);
+                printf("Имя получателя: %s\n", letter->name1);
+                    printf("Адрес отправителя: %s\n", letter->adr2);
+                        printf("Фамилия отправителя: %s\n", letter->fam2);
+                            printf("Имя отправителя: %s\n", letter->name2);
+                                printf("Стоимость: %.2lf\n", letter->cost);
+                                    printf("Дата отправки: %d-%02d-%02d\n", letter->send_date.tm_mday,
+                                               letter->send_date.tm_mon + 1, letter->send_date.tm_year + 1900);
+                                                   printf("-----\n");
+}
+
+// Функция для печати всей базы данных писем 
+// Принимает указатель на базу данных (массив структур) и количество писем в базе
+void print_letters(struct Letter *letters, int count) {
+        if (count == 0) { 
+                    printf("База данных пуста.\n");
+                            return;
+        }
+
+            for (int i = 0; i < count; i++) { 
+                        print_letter(&letters[i]); 
+            }
+}
+
+// Функция для поиска письма по фамилии и имени отправителя
+// Принимает указатель на базу данных, количество писем, фамилию и имя для поиска
+// Выводит на экран найденные письма
+void find_by_sender(struct Letter *letters, int count, char *fam2, char *name2) {
+        int found = 0; 
+            for (int i = 0; i < count; i++) { 
+                        if (strcmp(letters[i].fam2, fam2) == 0 && strcmp(letters[i].name2, name2) == 0) {
+                                        print_letter(&letters[i]); 
+                                                    found = 1; 
+                        }
+            }
+                if (!found) { 
+                            printf("Письма от %s %s не найдены.\n", fam2, name2); 
+                }
+}
+
+// Функция для поиска писем со стоимостью выше заданной
+// Принимает указатель на базу данных, количество писем и минимальную стоимость
+// Выводит на экран найденные письма
+void find_by_cost(struct Letter *letters, int count, double min_cost) {
+        int found = 0; 
+            for (int i = 0; i < count; i++) { 
+                        if (letters[i].cost > min_cost) { 
+                                        print_letter(&letters[i]); 
+                                                    found = 1; 
+                        }
+            }
+                if (!found) { 
+                            printf("Письма дороже %.2lf не найдены.\n", min_cost); 
+                }
+}
+
+// Функция для сравнения двух писем по стоимости (для qsort)
+int compare_letters_by_cost(const void *a, const void *b) {
+        double cost_a = ((struct Letter *)a)->cost; 
+            double cost_b = ((struct Letter *)b)->cost; 
+                return (cost_b - cost_a); 
+}
+ 
+ // Функция для сортировки базы данных по убыванию стоимости
+ // Принимает указатель на базу данных и количество писем
+ void sort_by_cost(struct Letter *letters, int count) {
+        qsort(letters, count, sizeof(struct Letter), compare_letters_by_cost); 
+            printf("База данных отсортирована по убыванию стоимости.\n"); 
+ }
+
+ int main() {
+        struct Letter *letters = NULL; 
+            int count = 0; 
+                int choice; 
+
+                    while (1) { 
+                                printf("Меню:\n"); 
+                                        printf("1. Добавить письмо\n");
+                                                printf("2. Распечатать базу данных\n");
+                                                        printf("3. Поиск по отправителю\n");
+                                                                printf("4. Поиск по стоимости\n");
+                                                                        printf("5. Сортировать по стоимости\n");
+                                                                                printf("6. Выход\n");
+                                                                                        printf("Выберите действие: ");
+                                                                                                scanf("%d", &choice); 
+                                                                                                        getchar(); 
+
+                                                                                                                switch (choice) { 
+                                                                                                                                case 1: 
+                                                                                                                                                count = add_letter(&letters, count); 
+                                                                                                                                                                break; 
+                                                                                                                                                                            case 2: 
+                                                                                                                                                                                            print_letters(letters, count); 
+                                                                                                                                                                                                            break; 
+                                                                                                                                                                                                                        case 3: { 
+                                                                                                                                                                                                                                            char fam2[1024], name2[1024]; 
+                                                                                                                                                                                                                                                            printf("Введите фамилию отправителя: ");
+                                                                                                                                                                                                                                                                            fgets(fam2, sizeof(fam2), stdin); 
+                                                                                                                                                                                                                                                                                            fam2[strcspn(fam2, "\n")] = 0; 
+                                                                                                                                                                                                                                                                                                            printf("Введите имя отправителя: ");
+                                                                                                                                                                                                                                                                                                                            fgets(name2, sizeof(name2), stdin); 
+                                                                                                                                                                                                                                                                                                                                            name2[strcspn(name2, "\n")] = 0; 
+                                                                                                                                                                                                                                                                                                                                                            find_by_sender(letters, count, fam2, name2); 
+                                                                                                                                                                                                                                                                                                                                                                            break; 
+                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                    case 4: { 
+                                                                                                                                                                                                                                                        double min_cost; 
+                                                                                                                                                                                                                                                                        printf("Введите минимальную стоимость: ");
+                                                                                                                                                                                                                                                                                        scanf("%lf", &min_cost); 
+                                                                                                                                                                                                                                                                                                        getchar(); 
+                                                                                                                                                                                                                                                                                                                        find_by_cost(letters, count, min_cost); 
+                                                                                                                                                                                                                                                                                                                                        break; 
+                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                case 5: 
+                                                                                                                                                                                                                                                                sort_by_cost(letters, count); 
+                                                                                                                                                                                                                                                                                break; 
+                                                                                                                                                                                                                                                                                            case 6: 
+                                                                                                                                                                                                                                                                                                            for (int i = 0; i < count; i++) { 
+                                                                                                                                                                                                                                                                                                                                    free(letters[i].adr1); 
+                                                                                                                                                                                                                                                                                                                                                        free(letters[i].fam1); 
+                                                                                                                                                                                                                                                                                                                                                                            free(letters[i].name1); 
+                                                                                                                                                                                                                                                                                                                                                                                                free(letters[i].adr2); 
+                                                                                                                                                                                                                                                                                                                                                                                                                    free(letters[i].fam2); 
+                                                                                                                                                                                                                                                                                                                                                                                                                                        free(letters[i].name2); 
+                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                            free(letters); 
+                                                                                                                                                                                                                                                                                                                                            return 0; 
+                                                                                                                                                                                                                                                                                                                                                        default: 
+                                                                                                                                                                                                                                                                                                                                                                        printf("Неверный выбор.\n"); 
+                                                                                                                }
+                    }
+ }
+                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                        }
+                                                                                                                }
+                    }
+ }
+ }
+}
+                }
+                        }
+            }
+}
+                }
+                        }
+            }
+}
+            }
+        }
+}
+}
+                                                                                                                                                                                                                            }
+                                                                                                                                                                                                    }
+                                                                                                                                                                    }
+                                                                                                                                                }
+}
+}
