@@ -107,7 +107,7 @@ int add_letter(struct Letter **letters, int count, struct Date currentDate) {
 
 // Функция для печати информации о письме в виде строки таблицы
 void print_letter_row(struct Letter *letter) {
-    printf("| %-18s   %-2s %-25s  %-18s   %-2s %-25s   %-9.2lf    %02d.%02d.%04d  %d дней \n",
+    printf("| %-18s   %-2s %-25s  %-18s   %-2s %-25s   %-9.2lf  %02d.%02d.%04d  %d дней \n",
            letter->adr1, letter->recipient.surname, letter->recipient.name,
            letter->adr2, letter->sender.surname, letter->sender.name,
            letter->cost, letter->sending_date.day, letter->sending_date.month,
@@ -194,7 +194,13 @@ void find_letters_by_recipient(struct Letter *letters, int count, char *surname,
 int compare_letters_by_cost(const void *a, const void *b) {
     double cost_a = ((struct Letter *)a)->cost; 
     double cost_b = ((struct Letter *)b)->cost; 
-    return (cost_b - cost_a); 
+    if (cost_a != cost_b) {
+        return (cost_b - cost_a);
+    } else {
+        int delivery_time_a = ((struct Letter *)a)->delivery_time;
+        int delivery_time_b = ((struct Letter *)b)->delivery_time;
+        return (delivery_time_b - delivery_time_a);
+    }
 }
  
 // Функция для сортировки базы данных по убыванию стоимости
